@@ -1,12 +1,12 @@
 <?php
-session_start(); // Inicia sesiones para auth
+session_start(); // Inicia sesiones
 
-// Config DB (ajusta si cambias)
-$servername = "127.0.0.1";
-$username = "root";
-$password = "";
-$dbname = "consultorio_medico";
-
+// Configuración DB usando variables de entorno (Railway)
+$servername = $_ENV['DB_HOST']      ?? getenv('DB_HOST')      ?? '127.0.0.1';
+$username   = $_ENV['DB_USER']      ?? getenv('DB_USER')      ?? 'root';
+$password   = $_ENV['DB_PASSWORD']  ?? getenv('DB_PASSWORD')  ?? '';
+$dbname     = $_ENV['DB_NAME']      ?? getenv('DB_NAME')      ?? 'railway';
+$port       = $_ENV['DB_PORT']      ?? getenv('DB_PORT')      ?? '3306';
 try {
     $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

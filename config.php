@@ -1,6 +1,7 @@
 <?php
-session_start();
+session_start(); // Inicia sesiones para auth
 
+// Config DB (ajusta si cambias)
 $servername = "127.0.0.1";
 $username = "root";
 $password = "";
@@ -17,6 +18,7 @@ try {
 $base_key = 'mi-clave-secreta-super-larga-para-aes-256';
 $encryption_key = hash('sha256', $base_key, true); // Ahora 32 bytes exactos
 
+// Función encriptar/desencriptar
 function encryptData($data, $key) {
     if (empty($data)) return null; // Si vacío, no encripta
     $iv = openssl_random_pseudo_bytes(16);
@@ -39,12 +41,22 @@ function decryptData($data, $key) {
     return $decrypted === false ? $data : $decrypted; // Fallback
 }
 
+// Verificar si usuario está logueado
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
+// Redirigir si no logueado
 if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) != 'login.php') {
     header("Location: login.php");
     exit();
 }
+
+// Configuración de reCAPTCHA (agregado para portal-paciente)
+$recaptcha_site_key = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Reemplaza con tu SITE KEY real
+$recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Reemplaza con tu SECRET KEY real
+
+// Carpeta para uploads (para expedientes)
+$upload_dir = 'uploads/';
+if (!file_exists($upload_dir)) { mkdir($upload_dir, 0755, true); }
 ?>

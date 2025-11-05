@@ -73,29 +73,36 @@ try {
 
         <table>
             <thead><tr><th>ID</th><th>Nombre Completo</th><th>Email</th><th>Historial (Desencriptado)</th><th>Alergias (Desencriptado)</th><th>Acciones</th></tr></thead>
-            <tbody>
-                <?php foreach ($pacientes as $p): 
-                    $historial_dec = decryptData($p['historial_medico'], $encryption_key);
-                    $alergias_json = decryptData($p['alergias'], $encryption_key);
-                    $alergias_dec = $alergias_json ? json_decode($alergias_json, true) : [];
-                ?>
-                <tr>
-                    <td><?= $p['id'] ?></td>
-                    <td><?= htmlspecialchars($p['nombre'] . ' ' . $p['apellido']) ?></td>
-                    <td><?= htmlspecialchars($p['email']) ?></td>
-                    <td><?= htmlspecialchars($historial_dec ?: 'Sin historial') ?></td>
-                    <td><?= htmlspecialchars(implode(', ', $alergias_dec) ?: 'Ninguna') ?></td>
-                    <td>
-                        <a href="expedientes.php?paciente_id=<?= $p['id'] ?>">Ver/Crear Expedientes</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
+         <tbody>
+    <?php foreach ($pacientes as $p): 
+        $historial_dec = decryptData($p['historial_medico'], $encryption_key);
+        $alergias_json = decryptData($p['alergias'], $encryption_key);
+        $alergias_dec = $alergias_json ? json_decode($alergias_json, true) : [];
+        $alergias_str = implode(', ', $alergias_dec);
+        $es_alerta = (strpos($alergias_str, 'penicilina') !== false || strpos(strtolower($historial_dec), 'diabetes') !== false); // Ejemplos de alertas
+    ?>
+    <tr class="<?= $es_alerta ? 'alerta-roja' : '' ?>">
+        <td><?= $p['id'] ?></td>
+        <td><?= htmlspecialchars($p['nombre'] . ' ' . $p['apellido']) ?></td>
+        <td><?= htmlspecialchars($p['email']) ?></td>
+        <td><?= htmlspecialchars($historial_dec ?: 'Sin historial') ?></td>
+        <td><?= htmlspecialchars($alergias_str ?: 'Ninguna') ?></td>
+        <td>
+            <?php if ($es_alerta): ?>
+                <span style="color: red; font-weight: bold;">⚠️ ALERTA: Revisar alergias/historial</span>
+            <?php endif; ?>
+            <a href="expedientes.php?paciente_id=<?= $p['id'] ?>">Ver/Crear Expedientes</a>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</tbody>
         </table>
 
         <nav>
             <a href="index.php">Volver al Menú</a> | <a href="expedientes.php">Expedientes</a> | <a href="reportes.php">Reportes</a>
         </nav>
     </div>
+    
 </body>
+
 </html>

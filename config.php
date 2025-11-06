@@ -4,22 +4,19 @@ session_start(); // Inicia sesiones para autenticación
 // =======================
 // CONFIGURACIÓN BASE DE DATOS (Railway + Local)
 // =======================
-$servername = $_ENV['DB_HOST']      ?? getenv('DB_HOST')      ?? '127.0.0.1';
-$username   = $_ENV['DB_USER']      ?? getenv('DB_USER')      ?? 'root';
-$password   = $_ENV['DB_PASSWORD']  ?? getenv('DB_PASSWORD')  ?? '';
-$dbname     = $_ENV['DB_NAME']      ?? getenv('DB_NAME')      ?? 'railway';
-$port       = $_ENV['DB_PORT']      ?? getenv('DB_PORT')      ?? '3306';
+// Reemplaza la sección DB con:
+$database_url = parse_url(getenv('DATABASE_URL'));
+$host = $database_url['host'];
+$port = $database_url['port'];
+$dbname = ltrim($database_url['path'], '/');
+$username = $database_url['user'];
+$password = $database_url['pass'];
 
 try {
-    // Conexión PDO con PUERTO incluido (OBLIGATORIO en Railway)
-    $pdo = new PDO("mysql:host=$servername;port=$port;dbname=$dbname", $username, $password);
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec("SET NAMES utf8");
 } catch(PDOException $e) {
-    // En producción, muestra error genérico (no detalles)
-    die("Error de conexión a la base de datos. Intenta más tarde.");
-    // Para depuración local: descomenta la línea de abajo
-    // die("Error de conexión: " . $e->getMessage());
+    die("Error de conexión: " . $e->getMessage());
 }
 
 // =======================
@@ -78,3 +75,4 @@ if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0755, true);
 }
 ?>
+

@@ -1,17 +1,25 @@
 <?php
-session_start(); // Inicia sesiones para autenticación
+session_start(); // Inicia sesiones para auth
 
-// =======================
-// CONFIGURACIÓN BASE DE DATOS (Railway + Local)
-// =======================
-// Reemplaza la sección DB con:
-$servername = getenv('DB_HOST') ?: '127.0.0.1';
-$username = getenv('DB_USERNAME') ?: 'root';
-$password = getenv('DB_PASSWORD') ?: '';
-$dbname = getenv('DB_NAME') ?: 'consultorio_medico';
-// ... resto igual
-$recaptcha_site_key = getenv('RECAPTCHA_SITE_KEY') ?: '';
-$recaptcha_secret_key = getenv('RECAPTCHA_SECRET_KEY') ?: '';
+// Config DB para Railway (PostgreSQL) o local (MySQL)
+$database_url = getenv('DATABASE_URL');
+if ($database_url) {
+    // Parsear URL de Railway para PG
+    $url = parse_url($database_url);
+    $host = $url['host'];
+    $port = $url['port'];
+    $dbname = ltrim($url['path'], '/'); // e.g., 'railway'
+    $username = $url['user']; // e.g., 'postgres'
+    $password = $url['pass']; // Tu PGPASSWORD: dhbPBBkWcqFXBjMyVJiilDMKuklWLSvC
+} else {
+    // Fallback local (MySQL/XAMPP)
+    $host = "127.0.0.1";
+    $port = 3306;
+    $dbname = "consultorio_medico";
+    $username = "root";
+    $password = "";
+}
+
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -19,61 +27,50 @@ try {
     die("Error de conexión: " . $e->getMessage());
 }
 
-// =======================
-// CLAVE DE ENCRIPTACIÓN (SEGURA - NUNCA EN CÓDIGO)
-// =======================
-$base_key = $_ENV['ENCRYPTION_KEY'] ?? 'clave-local-solo-para-xampp-1234567890';
-$encryption_key = hash('sha256', $base_key, true); // 32 bytes exactos para AES-256
+// Clave base para encriptación (cámbiala en producción)
+$base_key = 'mi-clave-secreta-super-larga-para-aes-256';
+$encryption_key = hash('sha256', $base_key, true); // 32 bytes exactos
 
-// =======================
-// FUNCIONES DE ENCRIPTACIÓN
-// =======================
+// Función encriptar/desencriptar
 function encryptData($data, $key) {
     if (empty($data)) return null;
     $iv = openssl_random_pseudo_bytes(16);
-    if ($iv === false) return $data;
+    if ($iv === false) {
+        error_log("Error IV: " . openssl_error_string());
+        return $data; // Texto plano si falla (dev)
+    }
     $encrypted = openssl_encrypt($data, 'AES-256-CBC', $key, 0, $iv);
-    if ($encrypted === false) return $data;
-    return base64_encode($encrypted . '::' . base64_encode($iv));
+    if ($encrypted === false) {
+        error_log("Error encriptación: " . openssl_error_string());
+        return $data;
+    }
+    return base64_encode($encrypted . '::' . $iv);
 }
 
 function decryptData($data, $key) {
-    if (empty($data)) return null;
-    $decoded = base64_decode($data);
-    if ($decoded === false) return $data;
-    list($encrypted_data, $iv_b64) = explode('::', $decoded, 2);
-    $iv = base64_decode($iv_b64);
-    if ($iv === false) return $data;
+    if (empty($data) || $data === null) return null;
+    list($encrypted_data, $iv) = explode('::', base64_decode($data), 2);
     $decrypted = openssl_decrypt($encrypted_data, 'AES-256-CBC', $key, 0, $iv);
-    return $decrypted === false ? $data : $decrypted;
+    return $decrypted === false ? $data : $decrypted; // Fallback
 }
 
-// =======================
-// AUTENTICACIÓN
-// =======================
+// Verificar si usuario está logueado
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-// Redirigir si no está logueado (excepto en login.php)
-if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) !== 'login.php') {
+// Redirigir si no logueado
+if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) != 'login.php') {
     header("Location: login.php");
     exit();
 }
 
-// =======================
-// RECAPTCHA (Portal Paciente)
-// =======================
-$recaptcha_site_key   = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
-$recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
+// Configuración de reCAPTCHA (para portal-paciente)
+$recaptcha_site_key = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Reemplaza con tu SITE KEY
+$recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Reemplaza con tu SECRET KEY
 
-// =======================
-// CARPETA DE UPLOADS (Expedientes)
-// =======================
+// Carpeta para uploads (para expedientes)
 $upload_dir = 'uploads/';
-if (!is_dir($upload_dir)) {
-    mkdir($upload_dir, 0755, true);
-}
+if (!file_exists($upload_dir)) { mkdir($upload_dir, 0755, true); }
 ?>
-
 

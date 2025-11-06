@@ -5,13 +5,13 @@ session_start(); // Inicia sesiones para autenticación
 // CONFIGURACIÓN BASE DE DATOS (Railway + Local)
 // =======================
 // Reemplaza la sección DB con:
-$database_url = parse_url(getenv('DATABASE_URL'));
-$host = $database_url['host'];
-$port = $database_url['port'];
-$dbname = ltrim($database_url['path'], '/');
-$username = $database_url['user'];
-$password = $database_url['pass'];
-
+$servername = getenv('DB_HOST') ?: '127.0.0.1';
+$username = getenv('DB_USERNAME') ?: 'root';
+$password = getenv('DB_PASSWORD') ?: '';
+$dbname = getenv('DB_NAME') ?: 'consultorio_medico';
+// ... resto igual
+$recaptcha_site_key = getenv('RECAPTCHA_SITE_KEY') ?: '';
+$recaptcha_secret_key = getenv('RECAPTCHA_SECRET_KEY') ?: '';
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -75,4 +75,5 @@ if (!is_dir($upload_dir)) {
     mkdir($upload_dir, 0755, true);
 }
 ?>
+
 

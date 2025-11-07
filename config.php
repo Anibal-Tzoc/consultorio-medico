@@ -9,14 +9,16 @@ $DB_PORT = getenv('DB_PORT') ?: '3306';
 $DB_USER = getenv('DB_USER') ?: 'root';
 
 // Conexión MySQLi (corregida, sin PDO mixto)
-$db = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, (int)$DB_PORT);
+$db = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
 
 if (!$db) {
     die("Error de conexión: " . mysqli_connect_error());
 }
 
-// Opcional: Set charset para UTF-8 (agregado después de conectar)
+// Opcional: Set charset para UTF-8
 mysqli_set_charset($db, "utf8mb4");
+
+// ... (resto de tu código: encriptación, funciones, etc.)
 
 // Clave base para encriptación (cámbiala en producción)
 $base_key = 'mi-clave-secreta-super-larga-para-aes-256';
@@ -66,5 +68,6 @@ if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0755, true);
 }
 ?>
+
 
 

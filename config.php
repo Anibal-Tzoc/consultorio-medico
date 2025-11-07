@@ -6,7 +6,7 @@ DB_NAME="railway"
 DB_PASSWORD="hVQXbZykIwasSgczFFymXvrUzmqwzqRF"
 DB_PORT="3306"
 DB_USER="root"
-
+$db=myqli_connect("$DB_HOST","$DB_USER","$DB_PASSWORD","$DB_NAME","$DB_PORT");
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -60,5 +60,6 @@ $recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Reemplaza
 $upload_dir = 'uploads/';
 if (!file_exists($upload_dir)) { mkdir($upload_dir, 0755, true); }
 ?>
+
 
 

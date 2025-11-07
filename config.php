@@ -1,24 +1,11 @@
 <?php
 session_start(); // Inicia sesiones para auth
 
-// Config DB para Railway (PostgreSQL) o local (MySQL)
-$database_url = getenv('DATABASE_URL');
-if ($database_url) {
-    // Parsear URL de Railway para PG
-    $url = parse_url($database_url);
-    $host = $url['host'];
-    $port = $url['port'];
-    $dbname = ltrim($url['path'], '/'); // e.g., 'railway'
-    $username = $url['user']; // e.g., 'postgres'
-    $password = $url['pass']; // Tu PGPASSWORD: dhbPBBkWcqFXBjMyVJiilDMKuklWLSvC
-} else {
-    // Fallback local (MySQL/XAMPP)
-    $host = "127.0.0.1";
-    $port = 3306;
-    $dbname = "consultorio_medico";
-    $username = "root";
-    $password = "";
-}
+DB_HOST="mysql.railway.internal"
+DB_NAME="railway"
+DB_PASSWORD="hVQXbZykIwasSgczFFymXvrUzmqwzqRF"
+DB_PORT="3306"
+DB_USER="root"
 
 try {
     $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $username, $password);
@@ -73,4 +60,5 @@ $recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Reemplaza
 $upload_dir = 'uploads/';
 if (!file_exists($upload_dir)) { mkdir($upload_dir, 0755, true); }
 ?>
+
 

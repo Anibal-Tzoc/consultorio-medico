@@ -1,3 +1,4 @@
+<?php
 session_start(); // Inicia sesiones para auth
 
 // Define variables de entorno (de Railway o local)
@@ -8,14 +9,15 @@ $DB_PORT = getenv('DB_PORT') ?: '3306';
 $DB_USER = getenv('DB_USER') ?: 'root';
 
 // Conexión MySQLi (corregida, sin PDO mixto)
-$db = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, $DB_PORT);
+$db = mysqli_connect($DB_HOST, $DB_USER, $DB_PASSWORD, $DB_NAME, (int)$DB_PORT);
 
 if (!$db) {
     die("Error de conexión: " . mysqli_connect_error());
 }
 
-// Opcional: Set charset para UTF-8
+// Opcional: Set charset para UTF-8 (agregado después de conectar)
 mysqli_set_charset($db, "utf8mb4");
+
 // Clave base para encriptación (cámbiala en producción)
 $base_key = 'mi-clave-secreta-super-larga-para-aes-256';
 $encryption_key = hash('sha256', $base_key, true); // 32 bytes exactos
@@ -54,15 +56,15 @@ if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) != 'login.php') {
     exit();
 }
 
-// Configuración de reCAPTCHA (para portal-paciente)
-$recaptcha_site_key = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Reemplaza con tu SITE KEY
-$recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Reemplaza con tu SECRET KEY
+// Configuración de reCAPTCHA (para portal-paciente) - Reemplaza con tus keys reales
+$recaptcha_site_key = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'; // Tu SITE KEY
+$recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Tu SECRET KEY
 
 // Carpeta para uploads (para expedientes)
 $upload_dir = 'uploads/';
-if (!file_exists($upload_dir)) { mkdir($upload_dir, 0755, true); }
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir, 0755, true);
+}
 ?>
-
-
 
 

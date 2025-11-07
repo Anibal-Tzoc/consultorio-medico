@@ -11,15 +11,6 @@ $DB_USER = getenv('DB_USER') ?: 'root';
 // Conexión MySQLi (corregida, sin PDO mixto)
 $db = mysqli_connect($DB_HOST, $DB_NAME, $DB_PASSWORD,$DB_PORT , $DB_USER  );
 
-<?php
-session_start(); // Inicia sesiones para auth
-
-// Config DB (ajusta si cambias)
-$servername = "127.0.0.1";
-$username = "root";
-$password = "";
-$dbname = "consultorio_medico";
-
 try {
     $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -70,6 +61,7 @@ if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) != 'login.php') {
 $upload_dir = 'uploads/';
 if (!file_exists($upload_dir)) { mkdir($upload_dir, 0755, true); }
 ?>
+
 
 
 

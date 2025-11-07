@@ -4,7 +4,11 @@ session_start(); // Inicia sesiones para auth
 // Define variables de entorno (de Railway o local)
 $DB_HOST = getenv('DB_HOST') ?: '127.0.0.1'; // mysql.railway.internal en Railway
 $DB_NAME = getenv('DB_NAME') ?: 'railway'; // o 'consultorio_medico' local
-$DB_PASSWORD = getenv('DB_PASSWORD') ?: ''; // tu pass: hVQXbZykIwasSgczFFymXvrUzmqwzqRF
+$DB_PASSWORD = getenv('DB_PASSWORD') ?: 'hVQXbZykIwasSgczFFymXvrUzmqwzqRF
+
+
+
+'; // tu pass: hVQXbZykIwasSgczFFymXvrUzmqwzqRF
 $DB_PORT = getenv('DB_PORT') ?: '3306';
 $DB_USER = getenv('DB_USER') ?: 'root';
 
@@ -68,3 +72,4 @@ if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0755, true); 
 }
 ?>
+

@@ -59,8 +59,7 @@ if (!isLoggedIn() && basename($_SERVER['PHP_SELF']) != 'login.php') {
 }
 
 // Configuración de reCAPTCHA
-$recaptcha_site_key = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI';
-$recaptcha_secret_key = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
+
 
 // Carpeta para uploads
 $upload_dir = 'uploads/';
@@ -68,6 +67,7 @@ if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0755, true); 
 }
 ?>
+
 
 
 
